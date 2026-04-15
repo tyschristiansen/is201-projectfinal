@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Surfing Powell, a wake surfing arcade game inspired by Flappy Bird.">
+    <title>Surfing Powell</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            margin: 0;
+            background: #d8eef0;
+            color: #14323b;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .page-shell {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px 20px;
+            background: #14323b;
+            box-shadow: 0 4px 14px rgba(20, 50, 59, 0.2);
+        }
+
+        .game-nav a {
+            color: #f6fbfb;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .game-nav a:hover {
+            color: #f2b36d;
+        }
+
+        .intro {
+            width: min(1040px, 94%);
+            margin: 26px auto 18px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 20px;
+            align-items: end;
+        }
+
+        .intro h1 {
+            margin: 0 0 10px;
+            color: #0d2830;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 2.6rem;
+            line-height: 1.1;
+        }
+
+        .intro p {
+            margin: 0;
+            color: #3c5962;
+            font-size: 1.05rem;
+        }
+
+        .stat-strip {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .stat {
+            padding: 12px;
+            border: 1px solid rgba(20, 50, 59, 0.14);
+            border-radius: 8px;
+            background: #ffffff;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(20, 50, 59, 0.08);
+        }
+
+        .stat span {
+            display: block;
+            color: #0f7066;
+            font-size: 1.4rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .stat small {
+            color: #59727a;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .game-wrap {
+            position: relative;
+            width: min(1040px, 94%);
+            margin: 0 auto 28px;
+            border: 5px solid #14323b;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #86d1d6;
+            box-shadow: 0 18px 42px rgba(20, 50, 59, 0.25);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: min(68vh, 620px);
+            min-height: 420px;
+            cursor: pointer;
+            background: #86d1d6;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 22px;
+            background: rgba(12, 35, 42, 0.28);
+            pointer-events: auto;
+        }
+
+        .overlay-card {
+            max-width: 460px;
+            padding: 24px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.94);
+            color: #14323b;
+            text-align: center;
+            box-shadow: 0 16px 32px rgba(20, 50, 59, 0.25);
+        }
+
+        .overlay-card h2 {
+            margin: 0 0 10px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.8rem;
+        }
+
+        .overlay-card p {
+            margin: 0;
+            color: #3c5962;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .controls {
+            width: min(1040px, 94%);
+            margin: 0 auto 46px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .control-card {
+            padding: 18px;
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid rgba(20, 50, 59, 0.12);
+            box-shadow: 0 8px 18px rgba(20, 50, 59, 0.08);
+        }
+
+        .control-card h2 {
+            margin: 0 0 8px;
+            color: #0d2830;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.2rem;
+        }
+
+        .control-card p {
+            margin: 0;
+            color: #4d656d;
+        }
+
+        button {
+            min-height: 44px;
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #d85f35;
+            color: #ffffff;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #a84425;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+            justify-content: center;
+        }
+
+        @media (max-width: 800px) {
+            .intro,
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            .intro h1 {
+                font-size: 2.1rem;
+            }
+
+            canvas {
+                min-height: 420px;
+                height: 62vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-shell">
+        <nav class="game-nav" aria-label="Game navigation">
+            <a href="professional.html">Professional Site</a>
+            <a href="scratch.html">Lake Powell</a>
+            <a href="surfing-powell.html">Restart Page</a>
+        </nav>
+
+        <section class="intro">
+            <div>
+                <h1>Surfing Powell</h1>
+                <p>Trail the boat, stay in the wake, and carve through the canyon gaps. Tap, click, or press space to pump the board upward.</p>
+            </div>
+            <div class="stat-strip" aria-label="Game stats">
+                <div class="stat"><span id="scoreText">0</span><small>Score</small></div>
+                <div class="stat"><span id="bestText">0</span><small>Best</small></div>
+                <div class="stat"><span id="speedText">1x</span><small>Speed</small></div>
+            </div>
+        </section>
+
+        <main class="game-wrap">
+            <canvas id="gameCanvas" width="960" height="540" aria-label="Surfing Powell game canvas"></canvas>
+            <div class="overlay" id="overlay">
+                <div class="overlay-card">
+                    <h2 id="overlayTitle">Ready to Surf?</h2>
+                    <p id="overlayMessage">Click, tap, or press space to start. Pass between the sandstone gates without hitting the canyon or sinking below the wake.</p>
+                    <div class="button-row">
+                        <button id="startButton" type="button">Start Riding</button>
+                        <button id="practiceButton" type="button">Practice Mode</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <section class="controls">
+            <div class="control-card">
+                <h2>Controls</h2>
+                <p>Space, click, or tap gives the surfer a lift. Small, steady pumps work better than panic smashing.</p>
+            </div>
+            <div class="control-card">
+                <h2>Goal</h2>
+                <p>Clear each canyon gate. The boat speeds up as your score climbs, so the clean line gets tighter.</p>
+            </div>
+            <div class="control-card">
+                <h2>Practice</h2>
+                <p>Practice mode slows the scroll and widens the gaps. It is perfect for learning the rhythm.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const overlay = document.getElementById("overlay");
+        const overlayTitle = document.getElementById("overlayTitle");
+        const overlayMessage = document.getElementById("overlayMessage");
+        const scoreText = document.getElementById("scoreText");
+        const bestText = document.getElementById("bestText");
+        const speedText = document.getElementById("speedText");
+        const startButton = document.getElementById("startButton");
+        const practiceButton = document.getElementById("practiceButton");
+
+        const state = {
+            mode: "ready",
+            practice: false,
+            score: 0,
+            best: Number(localStorage.getItem("surfingPowellBest") || 0),
+            frame: 0,
+            speed: 3,
+            gravity: 0.33,
+            lift: -6.7,
+            gates: [],
+            ripples: []
+        };
+
+        const surfer = {
+            x: 190,
+            y: 250,
+            vy: 0,
+            radius: 19,
+            rotation: 0
+        };
+
+        function fitCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            const ratio = window.devicePixelRatio || 1;
+            canvas.width = Math.round(rect.width * ratio);
+            canvas.height = Math.round(rect.height * ratio);
+            ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        }
+
+        function width() {
+            return canvas.getBoundingClientRect().width;
+        }
+
+        function height() {
+            return canvas.getBoundingClientRect().height;
+        }
+
+        function waterLine() {
+            return height() * 0.58;
+        }
+
+        function resetGame(practiceMode) {
+            state.mode = "playing";
+            state.practice = practiceMode;
+            state.score = 0;
+            state.frame = 0;
+            state.speed = practiceMode ? 2.45 : 3.15;
+            state.gravity = practiceMode ? 0.28 : 0.33;
+            state.lift = practiceMode ? -6.1 : -6.8;
+            state.gates = [];
+            state.ripples = [];
+            surfer.y = height() * 0.48;
+            surfer.vy = 0;
+            surfer.rotation = 0;
+            overlay.classList.add("hidden");
+            updateStats();
+            addGate(width() + 280);
+        }
+
+        function updateStats() {
+            scoreText.textContent = state.score;
+            bestText.textContent = state.best;
+            speedText.textContent = (state.speed / 3).toFixed(1) + "x";
+        }
+
+        function addGate(xPosition) {
+            const h = height();
+            const gap = state.practice ? 190 : Math.max(148, 188 - state.score * 1.3);
+            const margin = 80;
+            const topLimit = margin;
+            const bottomLimit = h - margin - gap;
+            const gapY = topLimit + Math.random() * Math.max(20, bottomLimit - topLimit);
+            state.gates.push({
+                x: xPosition,
+                width: 92,
+                gapY,
+                gap,
+                scored: false,
+                notch: Math.random() * 100
+            });
+        }
+
+        function pump() {
+            if (state.mode === "ready") {
+                resetGame(false);
+                return;
+            }
+            if (state.mode === "over") {
+                resetGame(state.practice);
+                return;
+            }
+            if (state.mode === "playing") {
+                surfer.vy = state.lift;
+                state.ripples.push({ x: surfer.x - 24, y: surfer.y + 18, life: 24 });
+            }
+        }
+
+        function endGame(reason) {
+            state.mode = "over";
+            state.best = Math.max(state.best, state.score);
+            localStorage.setItem("surfingPowellBest", String(state.best));
+            updateStats();
+            overlayTitle.textContent = "Wipeout";
+            overlayMessage.textContent = reason + " Score: " + state.score + ". Click, tap, or press space to ride again.";
+            startButton.textContent = "Ride Again";
+            practiceButton.textContent = "Practice Mode";
+            overlay.classList.remove("hidden");
+        }
+
+        function update() {
+            if (state.mode !== "playing") {
+                return;
+            }
+
+            state.frame += 1;
+            surfer.vy += state.gravity;
+            surfer.y += surfer.vy;
+            surfer.rotation = Math.max(-0.45, Math.min(0.65, surfer.vy / 10));
+            state.speed += state.practice ? 0.0008 : 0.0015;
+
+            if (state.gates.length === 0 || state.gates[state.gates.length - 1].x < width() - 330) {
+                addGate(width() + 80);
+            }
+
+            for (const gate of state.gates) {
+                gate.x -= state.speed;
+                if (!gate.scored && gate.x + gate.width < surfer.x - surfer.radius) {
+                    gate.scored = true;
+                    state.score += 1;
+                    state.best = Math.max(state.best, state.score);
+                    updateStats();
+                }
+            }
+
+            state.gates = state.gates.filter(gate => gate.x + gate.width > -80);
+            state.ripples = state.ripples
+                .map(ripple => ({ ...ripple, x: ripple.x - state.speed * 0.55, life: ripple.life - 1 }))
+                .filter(ripple => ripple.life > 0);
+
+            if (surfer.y - surfer.radius < 0) {
+                endGame("You launched too high and clipped the canyon air.");
+            }
+
+            if (surfer.y + surfer.radius > height() - 16) {
+                endGame("You sank below the wake.");
+            }
+
+            for (const gate of state.gates) {
+                const inX = surfer.x + surfer.radius > gate.x && surfer.x - surfer.radius < gate.x + gate.width;
+                const hitsTop = surfer.y - surfer.radius < gate.gapY;
+                const hitsBottom = surfer.y + surfer.radius > gate.gapY + gate.gap;
+                if (inX && (hitsTop || hitsBottom)) {
+                    endGame("You carved into the sandstone wall.");
+                }
+            }
+        }
+
+        function drawSky(w, h) {
+            const sky = ctx.createLinearGradient(0, 0, 0, h);
+            sky.addColorStop(0, "#93d6df");
+            sky.addColorStop(0.48, "#d9f2ef");
+            sky.addColorStop(1, "#8bcbd1");
+            ctx.fillStyle = sky;
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.fillStyle = "rgba(255, 255, 255, 0.78)";
+            ctx.beginPath();
+            ctx.ellipse(w * 0.78, h * 0.16, 52, 52, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawBackgroundCanyon(w, h) {
+            const base = waterLine() + 18;
+            ctx.fillStyle = "#b85d3d";
+            ctx.beginPath();
+            ctx.moveTo(0, base);
+            for (let x = 0; x <= w + 80; x += 80) {
+                const y = base - 60 - Math.sin((x + state.frame) * 0.01) * 22;
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(w, h);
+            ctx.lineTo(0, h);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = "#8f422d";
+            for (let x = -100; x < w + 100; x += 140) {
+                const sway = Math.sin((state.frame + x) * 0.01) * 12;
+                ctx.fillRect(x + sway, base - 34, 74, h - base + 50);
+            }
+        }
+
+        function drawWater(w, h) {
+            const line = waterLine();
+            const water = ctx.createLinearGradient(0, line, 0, h);
+            water.addColorStop(0, "#2d9fb3");
+            water.addColorStop(1, "#0f6172");
+            ctx.fillStyle = water;
+            ctx.fillRect(0, line, w, h - line);
+
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.38)";
+            ctx.lineWidth = 2;
+            for (let row = 0; row < 5; row += 1) {
+                const y = line + 20 + row * 36;
+                ctx.beginPath();
+                for (let x = -40; x <= w + 40; x += 20) {
+                    const waveY = y + Math.sin((x + state.frame * 3 + row * 41) * 0.03) * 4;
+                    if (x === -40) {
+                        ctx.moveTo(x, waveY);
+                    } else {
+                        ctx.lineTo(x, waveY);
+                    }
+                }
+                ctx.stroke();
+            }
+        }
+
+        function drawBoatWake() {
+            const line = waterLine();
+            const boatX = Math.min(width() - 160, surfer.x + 270);
+            const boatY = line + 38;
+
+            ctx.fillStyle = "rgba(255, 255, 255, 0.48)";
+            ctx.beginPath();
+            ctx.moveTo(boatX - 20, boatY + 34);
+            ctx.quadraticCurveTo(boatX - 140, boatY + 6, surfer.x + 28, surfer.y + 28);
+            ctx.quadraticCurveTo(boatX - 130, boatY + 92, boatX - 18, boatY + 58);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(boatX - 8, boatY + 35);
+            ctx.quadraticCurveTo(boatX - 112, boatY + 10, surfer.x + 10, surfer.y + 24);
+            ctx.stroke();
+
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(boatX - 6, boatY + 48);
+            ctx.quadraticCurveTo(boatX - 120, boatY + 88, surfer.x + 18, surfer.y + 38);
+            ctx.stroke();
+        }
+
+        function drawBoat() {
+            const line = waterLine();
+            const boatX = Math.min(width() - 160, surfer.x + 270);
+            const boatY = line + 38;
+
+            ctx.fillStyle = "rgba(7, 24, 29, 0.22)";
+            ctx.beginPath();
+            ctx.ellipse(boatX + 64, boatY + 32, 72, 11, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.save();
+            ctx.translate(boatX, boatY);
+
+            ctx.fillStyle = "#f7faf7";
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(30, -12, 104, -12, 146, 4);
+            ctx.lineTo(124, 34);
+            ctx.bezierCurveTo(88, 42, 38, 36, 12, 24);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = "#d85f35";
+            ctx.beginPath();
+            ctx.moveTo(20, 4);
+            ctx.lineTo(132, 4);
+            ctx.lineTo(122, 16);
+            ctx.lineTo(26, 16);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = "#14323b";
+            ctx.beginPath();
+            ctx.moveTo(64, -18);
+            ctx.lineTo(108, -18);
+            ctx.lineTo(124, 4);
+            ctx.lineTo(50, 4);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = "#8ad7dd";
+            ctx.fillRect(72, -12, 30, 12);
+
+            ctx.strokeStyle = "#14323b";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(76, -18);
+            ctx.lineTo(76, -54);
+            ctx.lineTo(114, -54);
+            ctx.lineTo(114, -18);
+            ctx.stroke();
+
+            ctx.fillStyle = "#14323b";
+            ctx.beginPath();
+            ctx.moveTo(146, 4);
+            ctx.lineTo(166, 12);
+            ctx.lineTo(145, 16);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+
+            ctx.strokeStyle = "#d85f35";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(boatX + 6, boatY + 10);
+            ctx.lineTo(surfer.x + 22, surfer.y + 1);
+            ctx.stroke();
+        }
+
+        function drawGate(gate, h) {
+            const topHeight = gate.gapY;
+            const bottomY = gate.gapY + gate.gap;
+            drawRock(gate.x, 0, gate.width, topHeight, true, gate.notch);
+            drawRock(gate.x, bottomY, gate.width, h - bottomY, false, gate.notch + 30);
+        }
+
+        function drawRock(x, y, rockW, rockH, top, notch) {
+            if (rockH <= 0) {
+                return;
+            }
+
+            const gradient = ctx.createLinearGradient(x, y, x + rockW, y + rockH);
+            gradient.addColorStop(0, "#7b3728");
+            gradient.addColorStop(0.24, "#b45234");
+            gradient.addColorStop(0.58, "#d47b4b");
+            gradient.addColorStop(1, "#6b2f25");
+            ctx.fillStyle = gradient;
+
+            const leftLean = Math.sin(notch) * 7;
+            const rightLean = Math.cos(notch * 0.7) * 8;
+            const edgeY = top ? y + rockH : y;
+
+            ctx.beginPath();
+            ctx.moveTo(x + leftLean, y);
+            ctx.lineTo(x + rockW + rightLean, y);
+            ctx.lineTo(x + rockW - rightLean * 0.4, y + rockH);
+
+            for (let i = 0; i <= 6; i += 1) {
+                const px = x + rockW - i * (rockW / 6);
+                const offset = Math.sin(notch + i * 1.7) * 12;
+                ctx.lineTo(px, edgeY + (top ? offset : -offset));
+            }
+
+            ctx.lineTo(x - leftLean * 0.4, y + rockH);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = "rgba(95, 41, 30, 0.38)";
+            const shadowX = x + rockW * 0.68;
+            ctx.beginPath();
+            ctx.moveTo(shadowX, y + 8);
+            ctx.lineTo(x + rockW + rightLean, y);
+            ctx.lineTo(x + rockW - rightLean * 0.4, y + rockH);
+            ctx.lineTo(shadowX - 8, y + rockH);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = "rgba(255, 221, 164, 0.28)";
+            ctx.beginPath();
+            ctx.moveTo(x + 8, y + 8);
+            ctx.lineTo(x + rockW * 0.34, y + 4);
+            ctx.lineTo(x + rockW * 0.26, y + rockH);
+            ctx.lineTo(x + 2, y + rockH);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = "rgba(255, 225, 169, 0.48)";
+            ctx.lineWidth = 2;
+            for (let stripe = y + 20; stripe < y + rockH; stripe += 28) {
+                ctx.beginPath();
+                ctx.moveTo(x + 6, stripe);
+                for (let sx = x + 6; sx <= x + rockW - 6; sx += 18) {
+                    const layerY = stripe + Math.sin((sx + notch) * 0.08) * 5;
+                    ctx.lineTo(sx, layerY);
+                }
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = "rgba(75, 31, 25, 0.32)";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(x + 14, y + 18);
+            ctx.bezierCurveTo(x + 18, y + rockH * 0.35, x + 2, y + rockH * 0.6, x + 16, y + rockH - 8);
+            ctx.moveTo(x + rockW - 18, y + 18);
+            ctx.bezierCurveTo(x + rockW - 2, y + rockH * 0.38, x + rockW - 24, y + rockH * 0.66, x + rockW - 10, y + rockH - 10);
+            ctx.stroke();
+
+            ctx.fillStyle = "#5f2b24";
+            ctx.fillRect(x + 8, top ? y + rockH - 8 : y, rockW - 16, 8);
+        }
+
+        function drawSurfer() {
+            ctx.save();
+            ctx.translate(surfer.x, surfer.y);
+            ctx.rotate(surfer.rotation);
+
+            ctx.fillStyle = "#f2b36d";
+            ctx.beginPath();
+            ctx.ellipse(0, 18, 36, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "#0f7066";
+            ctx.fillRect(-12, -10, 24, 26);
+
+            ctx.fillStyle = "#f0c29b";
+            ctx.beginPath();
+            ctx.arc(0, -20, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = "#14323b";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(-10, 3);
+            ctx.lineTo(-28, -8);
+            ctx.moveTo(10, 3);
+            ctx.lineTo(28, -5);
+            ctx.moveTo(-7, 15);
+            ctx.lineTo(-22, 24);
+            ctx.moveTo(7, 15);
+            ctx.lineTo(23, 23);
+            ctx.stroke();
+            ctx.restore();
+
+            for (const ripple of state.ripples) {
+                ctx.strokeStyle = "rgba(255, 255, 255, " + ripple.life / 28 + ")";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.ellipse(ripple.x, ripple.y, 34 - ripple.life * 0.4, 7, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        function drawReadyText() {
+            if (state.mode === "playing") {
+                return;
+            }
+            ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+            ctx.fillRect(0, 0, width(), height());
+        }
+
+        function draw() {
+            const w = width();
+            const h = height();
+            ctx.clearRect(0, 0, w, h);
+            drawSky(w, h);
+            drawBackgroundCanyon(w, h);
+            drawWater(w, h);
+            drawBoatWake();
+
+            for (const gate of state.gates) {
+                drawGate(gate, h);
+            }
+
+            drawSurfer();
+            drawBoat();
+            drawReadyText();
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.addEventListener("resize", () => {
+            fitCanvas();
+            draw();
+        });
+
+        window.addEventListener("keydown", event => {
+            if (event.code === "Space" || event.code === "ArrowUp") {
+                event.preventDefault();
+                pump();
+            }
+        });
+
+        canvas.addEventListener("pointerdown", event => {
+            event.preventDefault();
+            pump();
+        });
+
+        overlay.addEventListener("click", event => {
+            if (event.target === overlay) {
+                pump();
+            }
+        });
+
+        startButton.addEventListener("click", event => {
+            event.stopPropagation();
+            resetGame(false);
+        });
+
+        practiceButton.addEventListener("click", event => {
+            event.stopPropagation();
+            resetGame(true);
+        });
+
+        bestText.textContent = state.best;
+        fitCanvas();
+        draw();
+        loop();
+    </script>
+</body>
+</html>

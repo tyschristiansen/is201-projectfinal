@@ -1,0 +1,288 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: #e7f2ee;
+    color: #17313b;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+.top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    padding: 14px 20px;
+    background: #17313b;
+    box-shadow: 0 4px 16px rgba(23, 49, 59, 0.22);
+}
+
+.top-bar a {
+    color: #f8fbf9;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.top-bar a:hover {
+    color: #9fd4c4;
+}
+
+.hero {
+    min-height: 78vh;
+    display: flex;
+    align-items: center;
+    padding: 80px 8%;
+    background:
+        linear-gradient(rgba(10, 30, 38, 0.58), rgba(10, 30, 38, 0.58)),
+        url("https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/On_Lake_Powell_Utah%2C_%288096258858%29.jpg/1280px-On_Lake_Powell_Utah%2C_%288096258858%29.jpg");
+    background-position: center;
+    background-size: cover;
+}
+
+.hero-text {
+    max-width: 680px;
+    padding: 34px;
+    background: rgba(248, 251, 249, 0.92);
+    border-left: 8px solid #d85f35;
+}
+
+.kicker {
+    margin: 0 0 10px;
+    color: #0d6f64;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.95rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+h1,
+h2 {
+    margin-top: 0;
+    color: #10272f;
+    font-family: Georgia, "Times New Roman", serif;
+    line-height: 1.15;
+}
+
+h1 {
+    margin-bottom: 18px;
+    font-size: 3rem;
+}
+
+h2 {
+    font-size: 1.8rem;
+}
+
+.button-link {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 12px 18px;
+    border-radius: 6px;
+    background: #d85f35;
+    color: #ffffff;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.button-link:hover {
+    background: #a84425;
+}
+
+.button-link.secondary {
+    background: #0d6f64;
+}
+
+.button-link.secondary:hover {
+    background: #084d45;
+}
+
+.content-wrap {
+    width: min(1120px, 92%);
+    margin: 0 auto;
+    padding: 54px 0 70px;
+}
+
+.intro-card,
+.photo-panel,
+.list-card,
+.details-card,
+.video-section,
+.tableau-section,
+.closing-card {
+    margin-bottom: 32px;
+    padding: 28px;
+    border: 1px solid rgba(23, 49, 59, 0.12);
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 12px 30px rgba(23, 49, 59, 0.1);
+}
+
+.photo-panel {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 24px;
+    align-items: center;
+}
+
+.photo-panel img {
+    width: 100%;
+    border-radius: 8px;
+    display: block;
+}
+
+.photo-panel p {
+    color: #3f5962;
+    font-size: 1.15rem;
+}
+
+.two-column {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 28px;
+}
+
+.list-card ol {
+    padding-left: 24px;
+}
+
+.list-card li {
+    margin-bottom: 10px;
+}
+
+.list-card ul {
+    margin-top: 8px;
+    color: #3f5962;
+}
+
+.details-card {
+    background: #f3fbf8;
+    border-color: rgba(13, 111, 100, 0.22);
+}
+
+.details-card h2 {
+    color: #0d4f49;
+}
+
+.video-section {
+    background: #17313b;
+    color: #ecf7f4;
+}
+
+.video-section h2 {
+    color: #ffffff;
+}
+
+.video-section p {
+    color: #c9ddd7;
+}
+
+.video-section a {
+    color: #9fd4c4;
+    font-weight: bold;
+}
+
+.source-note {
+    margin-bottom: 0;
+    margin-top: 16px;
+    font-size: 0.95rem;
+}
+
+.video-frame {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #08171c;
+}
+
+.video-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.tableau-holder {
+    min-height: 620px;
+    overflow: auto;
+    border: 2px solid #d7e5e1;
+    border-radius: 8px;
+    background: #f8fbf9;
+}
+
+.tableauPlaceholder,
+.tableauViz {
+    width: 100%;
+    min-height: 620px;
+}
+
+.closing-card {
+    text-align: center;
+}
+
+.notes-box {
+    max-width: 680px;
+    margin: 22px auto 10px;
+    text-align: left;
+}
+
+.notes-box label {
+    display: block;
+    margin-bottom: 8px;
+    color: #0d6f64;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: bold;
+}
+
+.notes-box textarea {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #d7e5e1;
+    border-radius: 8px;
+    color: #17313b;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1rem;
+    resize: vertical;
+}
+
+.notes-box textarea:focus {
+    outline: 3px solid rgba(13, 111, 100, 0.18);
+    border-color: #0d6f64;
+}
+
+@media (max-width: 820px) {
+    .hero {
+        min-height: 68vh;
+        padding: 54px 5%;
+    }
+
+    .hero-text {
+        padding: 24px;
+    }
+
+    h1 {
+        font-size: 2.25rem;
+    }
+
+    .photo-panel,
+    .two-column {
+        grid-template-columns: 1fr;
+    }
+
+    .top-bar {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+}
